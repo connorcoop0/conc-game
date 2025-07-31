@@ -1,0 +1,8 @@
+Added movement + dash and simple wavedash
+
+need to make wavedash work a little better, might be abusable or just too powerful
+    - it is abusable if u get one dash reset you can spam it forever with jump+dash
+
+need to add climbing
+
+then we make level editor and i think we are good to make some levels
