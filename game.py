@@ -17,7 +17,7 @@ class Game:
 
         self.assets = {
             'player/idle': Animation(self, load_images('entities/player/idle'), img_dur=10),
-            'player/run': Animation(self, load_images('entities/player/run'), img_dur=10),
+            'player/run': Animation(self, load_images('entities/player/run'), img_dur=6),
             'player/jump': Animation(self, load_images('entities/player/jump')),
             'player/dash': Animation(self, load_images('entities/player/dash')),
             'background': load_image('background.png'),
@@ -26,14 +26,16 @@ class Game:
 
         self.player = PhysicsEntity(self, 'player', (50, 50), (8, 15))
         self.tilemap = Tilemap(self, 16)
+        self.offset = [0, 0]
 
         
     def run(self):
         while True:
+            self.offset = [int(self.player.pos[0] - self.display.get_width()//2), int(self.player.pos[1] - self.display.get_height()//2)]
             self.display.blit(self.assets['background'])
             self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
-            self.player.render(self.display)
-            self.tilemap.render(self.display)
+            self.player.render(self.display, (self.offset[0], self.offset[1]))
+            self.tilemap.render(self.display, (self.offset[0], self.offset[1]))
 
             
             

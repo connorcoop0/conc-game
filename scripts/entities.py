@@ -17,7 +17,7 @@ class PhysicsEntity:
         self.flip = False
         self.anim_offset = (-3, -3)
         self.dashing = 0
-        self.last_direction = 0
+        self.last_direction = 1
         self.wavedash = False
         self.player_jumped = False
 
@@ -83,15 +83,18 @@ class PhysicsEntity:
             self.dashing -= 1
             if self.dashing > 58:
                 if not self.directional_input['left_right'] and not self.directional_input['up_down']:
-                    self.velocity[0] = self.last_direction * 5
+                    self.velocity[0] = self.last_direction * 4
                 else:
-                    self.velocity[0] = self.directional_input['left_right'] * 5
-                self.velocity[1] = self.directional_input['up_down'] * 5
+                    self.velocity[0] = self.directional_input['left_right'] * 4
+                if self.directional_input['up_down']:
+                    self.velocity[1] = self.directional_input['up_down'] * 4
+                else:
+                    self.velocity[1] = 0
             if self.dashing > 50 and self.player_jumped:
                 self.wavedash = True
-            if self.dashing  <= 50 and self.wavedash:
+            if self.dashing  <= 50 and self.wavedash: 
                 self.velocity[0] *= 0.9 if abs(self.velocity[0]) > 0.5 else 0
-            elif self.dashing == 50 and not self.wavedash:
+            elif self.dashing == 45 and not self.wavedash:
                 self.velocity[0] = 0
                 self.velocity[1] = 0
         
@@ -104,7 +107,7 @@ class PhysicsEntity:
 
 
     # change animation based on movement
-        if self.dashing > 50:
+        if self.dashing > 45:
             self.set_action('dash')
         elif self.air_time > 4:
             self.set_action('jump')
@@ -122,8 +125,8 @@ class PhysicsEntity:
         
     
     # Put entity on screen
-    def render(self, surf):
-        surf.blit(pygame.transform.flip(self.img, 0 - self.flip, 0), (self.pos[0] + self.anim_offset[0], self.pos[1] + self.anim_offset[1]))
+    def render(self, surf, offset=(0, 0)):
+        surf.blit(pygame.transform.flip(self.img, 0 - self.flip, 0), (self.pos[0] + self.anim_offset[0] - offset[0], self.pos[1] + self.anim_offset[1] - offset[1]))
     
     def jump(self):
         if self.air_time < 7:
@@ -135,7 +138,7 @@ class PhysicsEntity:
             return False
     
     def dash(self):
-        if self.dashing <= 0 or (self.wavedash and self.dashing < 45):
+        if self.dashing <= 0 or (self.wavedash and self.dashing < 45): # this is making it so wavedash gives u infinite dashe
             self.dashing = 60
             return True
         else:

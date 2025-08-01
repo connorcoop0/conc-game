@@ -2,7 +2,13 @@ Added movement + dash and simple wavedash
 
 need to make wavedash work a little better, might be abusable or just too powerful
     - it is abusable if u get one dash reset you can spam it forever with jump+dash
+    - you can make yourself dash faster/farther by holding left/right while dashing
+
+also make jumping so you can hold it for higher jump or tap for low jump
 
 need to add climbing
+
+also add camera that tracks player
+
 
 then we make level editor and i think we are good to make some levels
