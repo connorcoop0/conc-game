@@ -30,6 +30,7 @@ class PhysicsEntity:
         self.dashing = 0
         self.wavedash = False
         self.can_dash = True
+        self.is_climbing = False
 
     # Sets action for animation
     def set_action(self, action):
@@ -107,7 +108,10 @@ class PhysicsEntity:
                     self.velocity[0] *= 0.95 if abs(self.velocity[0]) > 0.5 else 0
                 else:
                     self.velocity[0] *= 0.6 if abs(self.velocity[0]) > 0.5 else 0
-                self.velocity[1] = min(4, self.velocity[1] + 0.1)
+                if not self.is_climbing:
+                    self.velocity[1] = min(4, self.velocity[1] + 0.1)
+                else:
+                    self.velocity[1] = 0
 
         if not self.dashing:
             self.wavedash = 0
@@ -116,6 +120,11 @@ class PhysicsEntity:
         # change animation based on movement
         if self.dashing > 45:
             self.set_action('dash')
+        elif self.is_climbing:
+            if self.velocity[1] != 0:
+                self.set_action('climb')
+            else:
+                self.set_action('hold')
         elif self.air_time > 4:
             self.set_action('jump')
         elif frame_movement [0] != 0:
@@ -144,9 +153,12 @@ class PhysicsEntity:
         # if player is grabbing and can grab then we begin climbing
         if self.grabbing and self.can_grab:
             self.climbing()
+            self.is_climbing = True
         # otherwise gravity is enabled
         else:
             self.velocity[1] = min(5, self.velocity[1] + 0.1)
+            self.is_climbing = False
+
         
         
         
@@ -176,5 +188,6 @@ class PhysicsEntity:
             return False
     
     def climbing(self):
-        self.velocity[1] = self.directional_input['up_down'] * 1
+        if self.dashing <= 50:
+            self.velocity[1] = self.directional_input['up_down'] * 1
     

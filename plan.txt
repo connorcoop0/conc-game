@@ -1,15 +1,16 @@
 
-
 **********************
 * Needs Implementing *
 **********************
 - Dash resets
     - Based on if you have been on the ground for ~5 frames(?)
 
-
 - Level editor
     - Autotiling (way down the line)
 
+- Climb distance max
+    - Based on how long you have been climbing up for, maybe holding does a really slow drain
+    - just make counter go up while climbing up or down if climbing max hits then you cant climb any more
 
 ****************
 * Needs Fixing *

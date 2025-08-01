@@ -10,7 +10,7 @@ class Game:
         pygame.init()
 
         pygame.display.set_caption('ninja game')
-        self.screen = pygame.display.set_mode((640, 480))
+        self.screen = pygame.display.set_mode((1280, 960))
         self.display = pygame.Surface((320, 240))
         self.clock = pygame.time.Clock()
         self.movement = [False, False]
@@ -20,7 +20,8 @@ class Game:
             'player/run': Animation(self, load_images('entities/player/run'), img_dur=6),
             'player/jump': Animation(self, load_images('entities/player/jump')),
             'player/dash': Animation(self, load_images('entities/player/dash')),
-            # 'player/climb': Animation(self, load_images('entities/player/climb'))
+            'player/hold': Animation(self, load_images('entities/player/hold'), img_dur=10),
+            'player/climb': Animation(self, load_images('entities/player/climb'), img_dur=10),
             'background': load_image('background.png'),
             'blocks': load_images('tiles/blocks')
         }
@@ -42,13 +43,6 @@ class Game:
             self.tilemap.render(self.display, offset=render_scroll)
             self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
             self.player.render(self.display, offset=render_scroll)
-            
-            
-
-            
-
-            
-            
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

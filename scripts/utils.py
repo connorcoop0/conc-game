@@ -23,8 +23,11 @@ class Animation():
         self.img_dur = img_dur
 
     def update(self):
-        self.frame = (self.frame + 1) 
-        return self.images[self.frame//self.img_dur % len(self.images)]
+        if self.loop:
+            self.frame = (self.frame + 1) 
+            return self.images[self.frame//self.img_dur % len(self.images)]
+        else:
+            print("Implement non looping logic you moron")
     
     def copy(self):
         return self
