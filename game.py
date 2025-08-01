@@ -10,7 +10,7 @@ class Game:
         pygame.init()
 
         pygame.display.set_caption('ninja game')
-        self.screen = pygame.display.set_mode((1280, 960))
+        self.screen = pygame.display.set_mode((640, 480))
         self.display = pygame.Surface((320, 240))
         self.clock = pygame.time.Clock()
         self.movement = [False, False]
@@ -20,23 +20,34 @@ class Game:
             'player/run': Animation(self, load_images('entities/player/run'), img_dur=6),
             'player/jump': Animation(self, load_images('entities/player/jump')),
             'player/dash': Animation(self, load_images('entities/player/dash')),
+            # 'player/climb': Animation(self, load_images('entities/player/climb'))
             'background': load_image('background.png'),
             'blocks': load_images('tiles/blocks')
         }
 
         self.player = PhysicsEntity(self, 'player', (50, 50), (8, 15))
         self.tilemap = Tilemap(self, 16)
-        self.offset = [0, 0]
+        self.scroll = [0.0, 0.0]
+        # for variable jump height
+        self.jumping = 0
 
         
     def run(self):
         while True:
-            self.offset = [int(self.player.pos[0] - self.display.get_width()//2), int(self.player.pos[1] - self.display.get_height()//2)]
-            self.display.blit(self.assets['background'])
-            self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
-            self.player.render(self.display, (self.offset[0], self.offset[1]))
-            self.tilemap.render(self.display, (self.offset[0], self.offset[1]))
+            self.scroll[0] += (self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0]) / 10
+            self.scroll[1] += (self.player.rect().centery - self.display.get_height() / 2 - self.scroll[1]) / 10
+            render_scroll = (int(self.scroll[0]), int(self.scroll[1]))
 
+            self.display.blit(self.assets['background'])
+            self.tilemap.render(self.display, offset=render_scroll)
+            self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
+            self.player.render(self.display, offset=render_scroll)
+            
+            
+
+            
+
+            
             
             
             for event in pygame.event.get():
@@ -58,6 +69,8 @@ class Game:
                         self.player.directional_input['up_down'] += 1
                     if event.key == pygame.K_c:
                         self.player.dash()
+                    if event.key == pygame.K_x:
+                        self.player.grabbing = True
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT:
                         self.movement[0] = False
@@ -65,10 +78,14 @@ class Game:
                     if event.key == pygame.K_RIGHT:
                         self.movement[1] = False
                         self.player.directional_input['left_right'] -= 1
+                    if event.key == pygame.K_SPACE:
+                        self.player.stop_jump()
                     if event.key == pygame.K_UP:
                         self.player.directional_input['up_down'] += 1
                     if event.key == pygame.K_DOWN:
                         self.player.directional_input['up_down'] -= 1
+                    if event.key == pygame.K_x:
+                        self.player.grabbing = False
             
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
             pygame.display.update()

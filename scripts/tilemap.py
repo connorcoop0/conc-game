@@ -1,6 +1,8 @@
 import pygame
 
 NEIGHBOR_OFFSETS = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (-1, 1), (0, 1), (1, 1)]
+# This is for checking if there is a tile next to you that you can climb
+CLIMB_OFFSETS = [(-1, 0), (1, 0)]
 PHYSICS_TILES = {'blocks'}
 
 class Tilemap:
@@ -11,12 +13,13 @@ class Tilemap:
         self.offgrid_tiles = []
 
         for i in range(20):
-            self.tilemap[str(3 + i) + ';10'] = {'type': 'blocks', 'variant': 0, 'pos': (3 + i, 10)}
+            self.tilemap[str(2 + i) + ';10'] = {'type': 'blocks', 'variant': 0, 'pos': (2 + i, 10)}
+            self.tilemap['2;' + str(10 - i)] = {'type': 'blocks', 'variant': 0, 'pos': (2, 10 - i)}
     
-    def tiles_around(self, pos):
+    def tiles_around(self, pos, tile_offset=NEIGHBOR_OFFSETS):
         tiles = []
         tile_loc = (int(pos[0] // self.tile_size), int(pos[1] // self.tile_size))
-        for offset in NEIGHBOR_OFFSETS:
+        for offset in tile_offset:
             check_loc = str(tile_loc[0] + offset[0]) + ';' + str(tile_loc[1] + offset[1])
             if check_loc in self.tilemap:
                 tiles.append(self.tilemap[check_loc])
@@ -25,6 +28,13 @@ class Tilemap:
     def physics_rects_around(self, pos, offset=(0,0)):
         rects = []
         for tile in self.tiles_around(pos):
+            if tile['type'] in PHYSICS_TILES:
+                rects.append(pygame.Rect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size - offset[0], self.tile_size, self.tile_size - offset[0]))
+        return rects
+    
+    def climb_rects_around(self, pos, offset=(0,0)):
+        rects = []
+        for tile in self.tiles_around(pos, CLIMB_OFFSETS):
             if tile['type'] in PHYSICS_TILES:
                 rects.append(pygame.Rect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size - offset[0], self.tile_size, self.tile_size - offset[0]))
         return rects

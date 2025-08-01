@@ -2,35 +2,46 @@ import pygame
 import random
 import math
 
+# This is for checking if there is a tile next to you that you can climb
+CLIMB_OFFSETS = [(-1, 0), (1, 0)]
+
 class PhysicsEntity:
     def __init__(self, game, e_type, pos, size):
+        # Animation/player info variables
         self.game = game
         self.type = e_type
         self.pos = list(pos)
         self.size = size
-        self.velocity = [0, 0]
-        self.collisions = {'up': False, 'down': False, 'right': False, 'left': False}
-        self.directional_input = {'up_down': 0, 'left_right': 0}
         self.action = ''
+        self.animation = self.game.assets[self.type + '/' + 'idle'].copy()
         self.set_action('idle')
-        self.air_time = 0
         self.flip = False
         self.anim_offset = (-3, -3)
-        self.dashing = 0
+
+        # Movement variables
+        self.collisions = {'up': False, 'down': False, 'right': False, 'left': False}
+        self.directional_input = {'up_down': 0, 'left_right': 0}
         self.last_direction = 1
-        self.wavedash = False
+        self.velocity = [0, 0]
+        self.air_time = 0
         self.player_jumped = False
+        self.grabbing = False
+        self.can_grab = False
+        self.dashing = 0
+        self.wavedash = False
+        self.can_dash = True
 
     # Sets action for animation
     def set_action(self, action):
         if self.action != action:
             self.action = action
+            self.animation.frame = 0
 
     def rect(self):
         return pygame.Rect(self.pos[0], self.pos[1], self.size[0], self.size[1])
     
     def update(self, tilemap, movement=(0, 0)):
-        # Grab correct animation frame
+        # Get correct animation frame
         self.animation = self.game.assets[self.type + '/' + self.action].copy()
 
         # refresh collisions every frame
@@ -67,7 +78,7 @@ class PhysicsEntity:
                 if frame_movement[1] < 0:
                     entity_rect.top = rect.bottom
                     self.collisions['up'] = True
-                self.pos[1] = entity_rect.y
+                self.pos[1] = int(entity_rect.y)
         
         # Flip entity based on direction
         if movement[0] > 0:
@@ -76,7 +87,6 @@ class PhysicsEntity:
         elif movement[0] < 0:
             self. flip = True
             self.last_direction = -1
-        print(self.air_time)
         
         # Dashing
         if self.dashing:
@@ -91,22 +101,19 @@ class PhysicsEntity:
                 else:
                     self.velocity[1] = 0
             if self.dashing > 50 and self.player_jumped:
-                self.wavedash = True
-            if self.dashing  <= 50 and self.wavedash: 
-                self.velocity[0] *= 0.9 if abs(self.velocity[0]) > 0.5 else 0
-            elif self.dashing == 45 and not self.wavedash:
-                self.velocity[0] = 0
-                self.velocity[1] = 0
-        
+                self.wavedash += 1
+            if self.dashing  <= 50: 
+                if self.wavedash:
+                    self.velocity[0] *= 0.95 if abs(self.velocity[0]) > 0.5 else 0
+                else:
+                    self.velocity[0] *= 0.6 if abs(self.velocity[0]) > 0.5 else 0
+                self.velocity[1] = min(4, self.velocity[1] + 0.1)
+
         if not self.dashing:
-            self.wavedash = False
+            self.wavedash = 0
         self.player_jumped = False
 
-        # Gravity
-        self.velocity[1] = min(5, self.velocity[1] + 0.1)
-
-
-    # change animation based on movement
+        # change animation based on movement
         if self.dashing > 45:
             self.set_action('dash')
         elif self.air_time > 4:
@@ -121,26 +128,53 @@ class PhysicsEntity:
         # Make y movement 0 on up/down collision
         if self.collisions['down'] or self.collisions['up']:
             self.velocity[1] = 0
+
+
+        # Climbing logic
+        if tilemap.climb_rects_around(self.pos):
+            for rect in tilemap.climb_rects_around(self.pos):
+                # if the player is on the wall they can grab
+                if (rect.right == self.rect().left or rect.left == self.rect().right):
+                    self.can_grab = True
+                else:
+                    self.can_grab = False
+        # if no rects detected we cant grab
+        else:
+            self.can_grab = False
+        # if player is grabbing and can grab then we begin climbing
+        if self.grabbing and self.can_grab:
+            self.climbing()
+        # otherwise gravity is enabled
+        else:
+            self.velocity[1] = min(5, self.velocity[1] + 0.1)
+        
         
         
     
     # Put entity on screen
     def render(self, surf, offset=(0, 0)):
-        surf.blit(pygame.transform.flip(self.img, 0 - self.flip, 0), (self.pos[0] + self.anim_offset[0] - offset[0], self.pos[1] + self.anim_offset[1] - offset[1]))
+        surf.blit(pygame.transform.flip(self.img, self.flip, False), (self.pos[0] - offset[0] + self.anim_offset[0], self.pos[1] - offset[1] + self.anim_offset[1]))
     
     def jump(self):
-        if self.air_time < 7:
+        if self.air_time < 5:
             self.velocity[1] = -3
             self.player_jumped = True
-            return True
+            return True  
         else:
             self.player_jumped = False
             return False
+        
+    def stop_jump(self):
+        if self.velocity[1] < -1.5:
+            self.velocity[1] = min(5, self.velocity[1] + 1)
     
     def dash(self):
-        if self.dashing <= 0 or (self.wavedash and self.dashing < 45): # this is making it so wavedash gives u infinite dashe
+        if self.dashing <= 0:
             self.dashing = 60
             return True
         else:
             return False
+    
+    def climbing(self):
+        self.velocity[1] = self.directional_input['up_down'] * 1
     
