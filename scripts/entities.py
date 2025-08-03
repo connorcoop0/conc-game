@@ -39,7 +39,7 @@ class PhysicsEntity:
             self.animation.frame = 0
 
     def rect(self):
-        return pygame.Rect(self.pos[0], self.pos[1], self.size[0], self.size[1])
+        return pygame.FRect(self.pos[0], self.pos[1], self.size[0], self.size[1])
     
     def update(self, tilemap, movement=(0, 0)):
         # Get correct animation frame

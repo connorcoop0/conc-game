@@ -27,5 +27,7 @@
     - cant climb over walls, u need to jump or dash over them
     - would rather it smoothly climb over like in celeste
 
-- FRects
-    - Maybe change all Rects to FRects for easier collision and camera movement?
+
+
+
+Once these finishes are done I can publish the game, and ill publis the level editor if somebody wants to fool around with that
