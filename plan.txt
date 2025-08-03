@@ -5,12 +5,16 @@
 - Dash resets
     - Based on if you have been on the ground for ~5 frames(?)
 
-- Level editor
-    - Autotiling (way down the line)
-
 - Climb distance max
     - Based on how long you have been climbing up for, maybe holding does a really slow drain
     - just make counter go up while climbing up or down if climbing max hits then you cant climb any more
+
+- Make some sort of ground detection for the two above
+    - something that checks if youve hit the ground and refreshes climb distance and dash
+    - Also should reduce self.velocity[1] to 0 to fix dashing into ground and along ground affecting jump height
+
+- Level editor
+    - Autotiling (way down the line)
 
 ****************
 * Needs Fixing *
@@ -22,3 +26,6 @@
 - climbing
     - cant climb over walls, u need to jump or dash over them
     - would rather it smoothly climb over like in celeste
+
+- FRects
+    - Maybe change all Rects to FRects for easier collision and camera movement?

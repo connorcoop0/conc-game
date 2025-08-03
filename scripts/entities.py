@@ -159,16 +159,17 @@ class PhysicsEntity:
             self.velocity[1] = min(5, self.velocity[1] + 0.1)
             self.is_climbing = False
 
-        
-        
-        
-    
     # Put entity on screen
     def render(self, surf, offset=(0, 0)):
         surf.blit(pygame.transform.flip(self.img, self.flip, False), (self.pos[0] - offset[0] + self.anim_offset[0], self.pos[1] - offset[1] + self.anim_offset[1]))
-    
+
+
+class Player(PhysicsEntity):
+    def __init__(self, game, e_type, pos, size):
+        super().__init__(game, e_type, pos, size)
+
     def jump(self):
-        if self.air_time < 5:
+        if self.air_time < 5 or self.is_climbing:
             self.velocity[1] = -3
             self.player_jumped = True
             return True  
@@ -190,4 +191,3 @@ class PhysicsEntity:
     def climbing(self):
         if self.dashing <= 50:
             self.velocity[1] = self.directional_input['up_down'] * 1
-    
