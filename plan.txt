@@ -2,32 +2,19 @@
 **********************
 * Needs Implementing *
 **********************
-- Dash resets
-    - Based on if you have been on the ground for ~5 frames(?)
+- Dying
 
-- Climb distance max
-    - Based on how long you have been climbing up for, maybe holding does a really slow drain
-    - just make counter go up while climbing up or down if climbing max hits then you cant climb any more
+- Loading / Resetting World
+    - Create animation for it
 
-- Make some sort of ground detection for the two above
-    - something that checks if youve hit the ground and refreshes climb distance and dash
-    - Also should reduce self.velocity[1] to 0 to fix dashing into ground and along ground affecting jump height
+- Create 1-1 and 1-2 worlds
 
-- Level editor
-    - Autotiling (way down the line)
 
 ****************
 * Needs Fixing *
 ****************
-- wavedash
-    - if u get one dash reset you can spam it forever
-    - you can make yourself dash faster/farther by holding left/right while dashing
+- Level editor
+    - Autotiling
 
 - climbing
     - cant climb over walls, u need to jump or dash over them
-    - would rather it smoothly climb over like in celeste
-
-
-
-
-Once these finishes are done I can publish the game, and ill publis the level editor if somebody wants to fool around with that
