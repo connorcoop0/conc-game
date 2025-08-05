@@ -161,7 +161,7 @@ class PhysicsEntity:
         if self.air_time > 5:
             self.ground_time = 0
 
-        if (self.collisions['left'] or self.collisions['right']) and not self.is_climbing and not self.ground_time:
+        if (self.collisions['left'] or self.collisions['right']) and not self.is_climbing and not self.ground_time and self.directional_input['left_right']:
             self.wall_sliding = True
             self.velocity[1] = min(1, self.velocity[1] + 0.1)
         else:

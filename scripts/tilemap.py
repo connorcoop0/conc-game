@@ -26,14 +26,14 @@ class Tilemap:
         rects = []
         for tile in self.tiles_around(pos):
             if tile['type'] in PHYSICS_TILES:
-                rects.append(pygame.Rect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size - offset[0], self.tile_size, self.tile_size - offset[0]))
+                rects.append(pygame.FRect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size - offset[0], self.tile_size, self.tile_size - offset[0]))
         return rects
     
     def climb_rects_around(self, pos, offset=(0,0)):
         rects = []
         for tile in self.tiles_around(pos, CLIMB_OFFSETS):
             if tile['type'] in PHYSICS_TILES:
-                rects.append(pygame.Rect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size - offset[0], self.tile_size, self.tile_size - offset[0]))
+                rects.append(pygame.FRect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size - offset[0], self.tile_size, self.tile_size - offset[0]))
         return rects
     
     def save(self, path):

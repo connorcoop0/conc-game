@@ -79,12 +79,12 @@ class Editor:
                     if event.button == 1:
                         self.clicking = True
                         if not self.ongrid:
-                            self.tilemap.offgrid_tiles.append({'type': self.keys[self.tile_loc], 'variant': self.tile_variant, 'pos': (mpos[0] + self.scroll[0], mpos[1] + self.scroll[1])})
+                            self.tilemap.offgrid_tiles.append({'type': self.keys[self.tile_loc], 'variant': self.tile_variant, 'pos': (int(mpos[0] + self.scroll[0]), int(mpos[1] + self.scroll[1]))})
                     if event.button == 3:
                         self.right_clicking = True
                         if not self.ongrid:
                             for tile in self.tilemap.offgrid_tiles:
-                                if (mpos[0] >= tile['pos'][0] and mpos[0] <= tile['pos'][0] + self.tile_size) and mpos[1] >= tile['pos'][1] and mpos[1] <= tile['pos'][1] + self.tile_size:
+                                if (mpos[0] + self.scroll[0] >= tile['pos'][0] and mpos[0] + self.scroll[0] <= tile['pos'][0] + self.tile_size) and mpos[1] + self.scroll[1] >= tile['pos'][1] and mpos[1] + self.scroll[1] <= tile['pos'][1] + self.tile_size:
                                     self.tilemap.offgrid_tiles.remove(tile)
                     if event.button == 4:
                         if self.shift:

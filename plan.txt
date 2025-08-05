@@ -7,14 +7,19 @@
 - Loading / Resetting World
     - Create animation for it
 
+- Spawners
+
+- Autotiling
+
 - Create 1-1 and 1-2 worlds
+
+
 
 
 ****************
 * Needs Fixing *
 ****************
-- Level editor
-    - Autotiling
+- Cant climb over walls
 
-- climbing
-    - cant climb over walls, u need to jump or dash over them
+- offgrid deletion needs to be based off of the img height/width instead of just tile size
+- also add KEYS_r to reverse direction of img in editor
