@@ -94,6 +94,8 @@ class PhysicsEntity:
         elif movement[0] < 0:
             self. flip = True
             self.last_direction = -1
+
+        
         
         # Dashing
         if self.dashing:

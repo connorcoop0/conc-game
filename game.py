@@ -10,7 +10,7 @@ class Game:
         pygame.init()
 
         pygame.display.set_caption('Celeste Clone')
-        self.screen = pygame.display.set_mode((1920, 1080))
+        self.screen = pygame.display.set_mode((1440, 810))
         self.display = pygame.Surface((480, 270))
         self.clock = pygame.time.Clock()
         self.movement = [False, False]
@@ -27,19 +27,23 @@ class Game:
             'grass': load_images('tiles/grass'),
             'stone': load_images('tiles/stone'),
             'decor': load_images('tiles/decor'),
-            'large_decor': load_images('tiles/large_decor')
+            'large_decor': load_images('tiles/large_decor'),
+            'spawners': load_images('tiles/spawners'),
         }
 
         self.sfx = {
             'jump': pygame.mixer.Sound('data/sounds/jump.wav'),
             'dash': pygame.mixer.Sound('data/sounds/dash.wav'),
+            'walking': pygame.mixer.Sound('data/sounds/walking_dirt.wav'),
+            'long_fall': pygame.mixer.Sound('data/sounds/long_fall.wav'),
             'ambience': pygame.mixer.Sound('data/sounds/ambience.wav'),
             'music': pygame.mixer.Sound('data/sounds/music.wav')
         }
 
-        self.sfx['dash'].set_volume(0.5)
-        self.sfx['jump'].set_volume(0.5)
-        self.sfx['ambience'].set_volume(0.1)
+        self.sfx['dash'].set_volume(1)
+        self.sfx['jump'].set_volume(1)
+        self.sfx['ambience'].set_volume(0.2)
+        self.sfx['walking'].set_volume(1)
 
         self.player = Player(self, 'player', (50, 50), (8, 15))
         self.tilemap = Tilemap(self, 16)
@@ -50,8 +54,8 @@ class Game:
 
          
     def run(self):
-        pygame.mixer.music.load('data/sounds/music.wav')
-        pygame.mixer.music.set_volume(0.3)
+        pygame.mixer.music.load('data/sounds/OST (1.0).wav')
+        pygame.mixer.music.set_volume(0.5)
         pygame.mixer.music.play(-1)
 
         while True:
@@ -76,6 +80,21 @@ class Game:
             self.tilemap.render(self.display, offset=render_scroll)
             self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
             self.player.render(self.display, offset=render_scroll)
+
+
+            if self.player.action == 'run':
+                if self.sfx['walking'].get_num_channels() == 0:
+                    self.sfx['walking'].play(-1)
+            else:
+                self.sfx['walking'].stop()
+
+            if self.player.air_time >= 100 and self.player.climb_time == 0:
+                if self.sfx['long_fall'].get_num_channels() == 0:
+                    self.sfx['long_fall'].play(-1)
+            else:
+                self.sfx['long_fall'].stop()
+
+            
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
