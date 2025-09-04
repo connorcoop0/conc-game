@@ -5,13 +5,20 @@
 - Dying
 
 - Loading / Resetting World
-    - Create animation for it
+    - Create animation for it (screen black type)
 
 - Spawners
 
 - Autotiling
 
 - Create 1-1 and 1-2 worlds
+
+- Ground tile detection for walking
+    - this will help to distinguish walking sounds and probably can find other uses for it (crumbling blocks, moving platforms, etc)
+
+- Enemies?
+
+- Particle Effects
 
 
 

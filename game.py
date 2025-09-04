@@ -12,8 +12,8 @@ class Game:
         pygame.display.set_caption('Celeste Clone')
         self.screen = pygame.display.set_mode((1440, 810))
         self.display = pygame.Surface((480, 270))
-        self.clock = pygame.time.Clock()
-        self.movement = [False, False]
+        
+        
 
         self.assets = {
             'player/idle': Animation(self, load_images('entities/player/idle'), img_dur=10),
@@ -37,26 +37,33 @@ class Game:
             'walking': pygame.mixer.Sound('data/sounds/walking_dirt.wav'),
             'long_fall': pygame.mixer.Sound('data/sounds/long_fall.wav'),
             'ambience': pygame.mixer.Sound('data/sounds/ambience.wav'),
-            'music': pygame.mixer.Sound('data/sounds/music.wav')
+            'music': pygame.mixer.Sound('data/sounds/music.wav'),
+            'player_death': pygame.mixer.Sound('data/sounds/player_death.wav')
         }
 
         self.sfx['dash'].set_volume(1)
         self.sfx['jump'].set_volume(1)
         self.sfx['ambience'].set_volume(0.2)
         self.sfx['walking'].set_volume(1)
+        self.sfx['player_death'].set_volume(1)
 
+        
+         
+    def run(self):
+        pygame.mixer.music.load('data/sounds/OST (1.0).wav')
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1) 
+        self.clock = pygame.time.Clock()
+        self.movement = [False, False]
         self.player = Player(self, 'player', (50, 50), (8, 15))
         self.tilemap = Tilemap(self, 16)
         self.tilemap.load('map.json')
         self.scroll = [0.0, 0.0]
         # for variable jump height
         self.jumping = 0
-
-         
-    def run(self):
-        pygame.mixer.music.load('data/sounds/OST (1.0).wav')
-        pygame.mixer.music.set_volume(0.5)
-        pygame.mixer.music.play(-1)
+        self.spawn_width = 300
+        self.death_width = 0
+        self.dying = False
 
         while True:
             offset_x = self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0]
@@ -69,10 +76,8 @@ class Game:
                 self.scroll[1] += offset_y / 15
             
 
-            print(self.scroll)
             render_scroll = (int(self.scroll[0]), int(self.scroll[1]))
 
-            print(render_scroll)
             
   
             self.display.blit(self.assets['background'])
@@ -94,6 +99,11 @@ class Game:
             else:
                 self.sfx['long_fall'].stop()
 
+
+            # Kill player if they fall off map
+            if self.player.pos[1] > 1000:
+                  death()
+
             
             
             for event in pygame.event.get():
@@ -102,18 +112,18 @@ class Game:
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT:
-                        self.player.directional_input['left_right'] -= 1
+                        self.player.directional_input['left_right'] = -1
                         self.movement[0] = True
                     if event.key == pygame.K_RIGHT:
-                        self.player.directional_input['left_right'] += 1
+                        self.player.directional_input['left_right'] = 1
                         self.movement[1] = True
                     if event.key == pygame.K_SPACE:
                         if self.player.jump():
                             self.sfx['jump'].play()
                     if event.key == pygame.K_UP:
-                        self.player.directional_input['up_down'] -= 1
+                        self.player.directional_input['up_down'] = -1
                     if event.key == pygame.K_DOWN:
-                        self.player.directional_input['up_down'] += 1
+                        self.player.directional_input['up_down'] = 1
                     if event.key == pygame.K_c:
                         if self.player.dash():
                             self.sfx['dash'].play()
@@ -121,21 +131,51 @@ class Game:
                         self.player.grabbing = True
                         # If the player spam grabs their timer goes up way faster
                         self.player.climb_time += 5 if self.player.climb_time < 190 else 0
+                    if event.key == pygame.K_r:
+                        death()
+                        
+                        
+
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT:
                         self.movement[0] = False
-                        self.player.directional_input['left_right'] += 1
+                        self.player.directional_input['left_right'] = 0
                     if event.key == pygame.K_RIGHT:
                         self.movement[1] = False
-                        self.player.directional_input['left_right'] -= 1
+                        self.player.directional_input['left_right'] = 0
                     if event.key == pygame.K_SPACE:
                         self.player.stop_jump()
                     if event.key == pygame.K_UP:
-                        self.player.directional_input['up_down'] += 1
+                        self.player.directional_input['up_down'] = 0
                     if event.key == pygame.K_DOWN:
-                        self.player.directional_input['up_down'] -= 1
+                        self.player.directional_input['up_down'] = 0
                     if event.key == pygame.K_x:
                         self.player.grabbing = False
+            
+
+            def death():
+                if not self.dying:
+                    self.dying = True
+                    pygame.mixer.music.stop() 
+                    self.death_width = 0
+                    self.sfx['player_death'].play()
+                
+
+            
+            if self.dying:
+                if self.death_width < 300:
+                    pygame.draw.circle(self.display, (0, 0, 0), (self.display.get_width()/2,self.display.get_height()/2), 300, self.death_width)
+                    self.death_width += 5
+                elif self.death_width == 300:
+                    for sound in self.sfx:
+                            if sound != 'player_death':
+                                self.sfx[sound].stop()
+                    
+                    Game().run()
+                
+            if self.spawn_width > 1:
+                pygame.draw.circle(self.display, (0, 0, 0), (self.display.get_width()/2,self.display.get_height()/2), 300, self.spawn_width)
+                self.spawn_width -= 5
             
             self.screen.blit(pygame.transform.scale(self.display, self.screen.get_size()), (0, 0))
             pygame.display.update()

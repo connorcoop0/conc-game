@@ -137,6 +137,7 @@ class PhysicsEntity:
             for rect in tilemap.climb_rects_around(self.pos):
                 # if the player is on the wall they can grab
                 if (rect.right == self.rect().left or rect.left == self.rect().right):
+                    print("damn!")
                     self.can_grab = True
                 else:
                     self.can_grab = False
